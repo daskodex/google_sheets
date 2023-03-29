@@ -3,12 +3,11 @@ from pprint import pprint
 import httplib2
 import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
-
-
+from pages.models import ParseResult
+from pages.tools import get_course
 
 
 class Command(BaseCommand):
-
     help = 'Google Sheets Reader'
 
     def handle(self, *args, **options):
@@ -26,10 +25,21 @@ class Command(BaseCommand):
         # Пример чтения файла
         values = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
-            range='A1:D50',
+            range='A1:D60',
             majorDimension='COLUMNS'
         ).execute()
-        # pprint(values['values'])
 
-        for row in values['values']:
-            pprint(row[0])
+        course = get_course()
+
+        ParseResult.objects.all().delete()
+
+        for i in range(1,len(values['values'][0])-1):
+            price_rur = float(float(values['values'][2][i]) * float(course)),
+            print(values['values'][0][i],
+                  values['values'][1][i],
+                  price_rur,
+                  values['values'][3][i])
+            ParseResult(number=values['values'][0][i],
+                        order_id=values['values'][1][i],
+                        price=price_rur,
+                        delivery_time=values['values'][3][i]).save()
