@@ -13,8 +13,8 @@ class ParseResult(models.Model):
                                            )
 
     price = models.PositiveIntegerField(default=0,
-                              verbose_name='Cтоимость,$',
-                              )
+                                        verbose_name='Cтоимость,$',
+                                        )
 
     delivery_time = models.DateField(verbose_name='Срок поставки',
                                      )
@@ -23,6 +23,10 @@ class ParseResult(models.Model):
                                           verbose_name='Срок поставки (исх.дата)',
                                           default=''
                                           )
+
+    expired = models.BooleanField(verbose_name='Просрочка проекта',
+                                   default=False,
+                                   )
 
     created_at = models.DateTimeField(verbose_name='Время получения данных',
                                       auto_now=True,
