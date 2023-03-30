@@ -14,11 +14,15 @@
 
 4.В core\settings.py прописать ip сервера для старта Django
 
-5.Получить из https://console.cloud.google.com/ файл .json с токенами
+5.Получить из https://console.cloud.google.com/ файл .json с токенами и сохранить в корень
+
+5.1 Прописать в правах доступа к google sheets пользователя с email из пункт 5.
+
+Пример: "client_email": "*******-service@pyintegration-*****.iam.gserviceaccount.com"
 
 6.Развернуть базу Постгрес из бэкапа или выполнить миграции
 
-7.Проверить доступы к базе в core\settings.py
+7.Проверить\добавить доступы к базе в core\settings.py
 
 8.На сервере настроить static файлы (если надо графику)
 
