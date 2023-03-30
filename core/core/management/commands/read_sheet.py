@@ -4,8 +4,8 @@ import httplib2
 import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from pages.models import ParseResult
-from pages.tools import get_course
-
+from pages.tools import get_course,DrowGraph
+from datetime import datetime
 
 class Command(BaseCommand):
     help = 'Google Sheets Reader'
@@ -33,13 +33,23 @@ class Command(BaseCommand):
 
         ParseResult.objects.all().delete()
 
-        for i in range(1,len(values['values'][0])-1):
-            price_rur = float(float(values['values'][2][i]) * float(course)),
-            print(values['values'][0][i],
-                  values['values'][1][i],
-                  price_rur,
-                  values['values'][3][i])
+        for i in range(1, len(values['values'][0])):
+
+            parsed_price = int(float(values['values'][2][i]) * float(course))
+
+
+            d = datetime.strptime(values['values'][3][i], "%d.%m.%Y")
+            parsed_date = d.strftime('%Y-%m-%d')
+
+            # print(values['values'][0][i],
+            #       values['values'][1][i],
+            #       parsed_price,
+            #       parsed_date)
+
             ParseResult(number=values['values'][0][i],
                         order_id=values['values'][1][i],
-                        price=price_rur,
-                        delivery_time=values['values'][3][i]).save()
+                        price=parsed_price,
+                        delivery_time=parsed_date,
+                        delivery_time_orig=values['values'][3][i]).save()
+
+            DrowGraph()

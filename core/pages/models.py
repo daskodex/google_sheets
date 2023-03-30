@@ -12,12 +12,17 @@ class ParseResult(models.Model):
                                            verbose_name='Заказ №',
                                            )
 
-    price = models.FloatField(default=0,
+    price = models.PositiveIntegerField(default=0,
                               verbose_name='Cтоимость,$',
                               )
 
     delivery_time = models.DateField(verbose_name='Срок поставки',
-                                    )
+                                     )
+
+    delivery_time_orig = models.CharField(max_length=20,
+                                          verbose_name='Срок поставки (исх.дата)',
+                                          default=''
+                                          )
 
     created_at = models.DateTimeField(verbose_name='Время получения данных',
                                       auto_now=True,
