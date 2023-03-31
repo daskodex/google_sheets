@@ -5,7 +5,7 @@ from django.db import models
 # Create your models here.
 
 class ParseResult(models.Model):
-    #модель описывает результаты сбора данных из таблицы
+    # модель описывает результаты сбора данных из таблицы
 
     number = models.PositiveIntegerField(default=0,
                                          verbose_name='Порядковый номер'
@@ -15,9 +15,13 @@ class ParseResult(models.Model):
                                            verbose_name='Заказ №',
                                            )
 
-    price = models.PositiveIntegerField(default=0,
-                                        verbose_name='Cтоимость,$',
-                                        )
+    price_usd = models.PositiveIntegerField(default=0,
+                                            verbose_name='Cтоимость,$',
+                                            )
+
+    price_rur = models.PositiveIntegerField(default=0,
+                                            verbose_name='Cтоимость,руб',
+                                            )
 
     delivery_time = models.DateField(verbose_name='Срок поставки',
                                      )
@@ -28,8 +32,8 @@ class ParseResult(models.Model):
                                           )
 
     expired = models.BooleanField(verbose_name='Просрочка проекта',
-                                   default=False,
-                                   )
+                                  default=False,
+                                  )
 
     created_at = models.DateTimeField(verbose_name='Время получения данных',
                                       auto_now=True,
