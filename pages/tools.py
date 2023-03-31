@@ -2,7 +2,7 @@ import requests
 from .models import ParseResult
 import matplotlib.pyplot as plt
 import telegram
-
+from decouple import config
 
 def get_course():
     # функция получения текущего курса доллара США к рублю.
@@ -53,5 +53,5 @@ def SendTGMessage(msg):
     """
     Надо указать token бота и chat_id (можно получить через (@getmyid_bot)
     """
-    bot = telegram.Bot(token='5993742888:AAEzAr_M2OE-xDhGQTJfdYlKNxIlVLP0QYY')
-    bot.sendMessage(chat_id=330327630, text=msg)
+    bot = telegram.Bot(token=config('TG_TOKEN'))
+    bot.sendMessage(chat_id=config('TG_CHAT_ID'), text=msg)

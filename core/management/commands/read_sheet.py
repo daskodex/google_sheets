@@ -6,6 +6,7 @@ from pages.models import ParseResult
 from pages.tools import get_course, DrowGraph, SendTGMessage
 from datetime import datetime, date
 
+
 class Command(BaseCommand):
     help = 'Google Sheets Reader'
 
