@@ -33,7 +33,7 @@ tr:nth-child(even) {
 
 
 <h2>Аналитика из гугл-таблицы:
-  Сумма по столбцу <b>"Cтоимость, $": {{ sum.price__sum }}</b>
+  Сумма по столбцу <b>"Cтоимость, $": {{ sum.price_usd__sum }}</b>
 </h2>
 
 <table>
@@ -41,6 +41,7 @@ tr:nth-child(even) {
     <th>№</th>
     <th>Заказ №</th>
     <th>Cтоимость, $</th>
+    <th>Cтоимость, ₽</th>
     <th>Срок поставки</th>
   </thead>
   <tbody>
@@ -48,7 +49,8 @@ tr:nth-child(even) {
   <tr>
     <td>{{ result.number }}</td>
     <td>{{ result.order_id }}</td>
-    <td>{{ result.price }}</td>
+    <td>{{ result.price_usd }}</td>
+    <td>{{ result.price_rur }}</td>
     <td>{{ result.delivery_time_orig }}
 
       {% if result.expired == True %}
