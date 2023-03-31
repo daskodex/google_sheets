@@ -8,7 +8,7 @@ def IndexView(request):
     #parseresult = ParseResult.objects.order_by('-delivery_time')
     parseresult = ParseResult.objects.all()
 
-    sum = ParseResult.objects.aggregate(Sum('price'))
+    sum = ParseResult.objects.aggregate(Sum('price_usd'))
 
     context = {
         'parseresult': parseresult,
