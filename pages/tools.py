@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import telegram
 from decouple import config
 
+
 def get_course():
     # функция получения текущего курса доллара США к рублю.
     try:
@@ -47,11 +48,22 @@ def DrowGraph():
     plt.savefig('.\core\static\core\graph.png')
 
 
-
-
 def SendTGMessage(msg):
     """
+    Функция отправки сообщая в телеграмм пользователя от имени бота
     Надо указать token бота и chat_id (можно получить через (@getmyid_bot)
     """
-    bot = telegram.Bot(token=config('TG_TOKEN'))
-    bot.sendMessage(chat_id=config('TG_CHAT_ID'), text=msg)
+    if not msg:
+        return False
+
+    try:
+        bot = telegram.Bot(token=config('TG_TOKEN'))
+        bot.sendMessage(chat_id=config('TG_CHAT_ID'), text=msg)
+        return True
+    except telegram.error.Unauthorized:
+        print('Ошибка: telegram.error.Unauthorized: Unauthorized, проверьте токен бота')
+        return False
+
+    except telegram.error.BadRequest:
+        print('Ошибка: telegram.error.BadRequest:, проверьте ID чата в телеграм')
+        return False
