@@ -5,17 +5,15 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pages.models import ParseResult
 from pages.tools import get_course, DrowGraph, SendTGMessage
 from datetime import datetime, date
-
+from decouple import config
 
 class Command(BaseCommand):
     help = 'Google Sheets Reader'
 
     def handle(self, *args, **options):
-        #имя файла с авторизацией
-        CREDENTIALS_FILE = 'credentials.json'
 
-        #ID гугл таблицы, можно взять из URL
-        spreadsheet_id = '1pw4NmxdZtjlsQGk24rO00UEap57EwN_d3MGJs3wnWQs'
+        CREDENTIALS_FILE = config('CREDENTIALS_FILE')
+        SPREADSHEETS_ID = config('SPREADSHEETS_ID')
 
         # Авторизуемся и получаем service — экземпляр доступа к API
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -27,20 +25,20 @@ class Command(BaseCommand):
 
         # Пример чтения файла
         values = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheet_id,
+            spreadsheetId=SPREADSHEETS_ID,
             range='A1:D60',
             majorDimension='COLUMNS'
         ).execute()
 
         #TODO поменять на динамическое определение диапазона
 
-        course = get_course()
-
         ParseResult.objects.all().delete()
+
+        expired_log = ''
 
         for i in range(1, len(values['values'][0])):
 
-            parsed_price = int(float(values['values'][2][i]) * float(course))
+            parsed_price = int(float(values['values'][2][i]) * float(get_course()))
 
             d = datetime.strptime(values['values'][3][i], "%d.%m.%Y")
             parsed_date = d.strftime('%Y-%m-%d')
@@ -48,8 +46,6 @@ class Command(BaseCommand):
             expired = True if str(date.today()) > parsed_date else False
 
             #Функция шлет сообщения от бота о том что заказ просрочен
-            # if expired:
-            #     SendTGMessage(f'Заказ с ID:{ values["values"][1][i] } просрочен')
 
             ParseResult(number=values['values'][0][i],
                         order_id=values['values'][1][i],
@@ -59,4 +55,10 @@ class Command(BaseCommand):
                         expired=expired,
                         ).save()
 
-            DrowGraph()
+            if expired:
+                expired_log += f'Заказ с ID:{values["values"][1][i]} просрочен\n'
+
+        DrowGraph()
+
+        SendTGMessage(expired_log)
+
