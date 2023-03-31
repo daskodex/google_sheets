@@ -8,7 +8,17 @@ import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from pages.models import ParseResult
 from datetime import datetime, date
+import time
 
+
+def time_of_function(function):
+    def wrapped(*args, **kwargs):
+        start_time = time.time()
+        result = function(*args, **kwargs)
+        print(time.time() - start_time)
+        return result
+
+    return wrapped
 
 
 def get_course():
@@ -39,18 +49,19 @@ def DrowGraph():
     # TODO 3.Замасштабоировать график
     # TODO 4.Переместить файл графика в static/img на продакте
 
-    parseresult = ParseResult.objects.all()
+    parseresult = ParseResult.objects.order_by('-delivery_time')
     x = []
     y = []
 
     for result in parseresult:
         x.append(result.delivery_time)
-        y.append(result.price)
+        y.append(result.price_usd)
 
     plt.plot(x, y)
     plt.xlabel('Дата заказах')
     plt.ylabel('Стоимость заказ в $')
     plt.title('Данные о заказа по датам')
+    plt.xticks(rotation=90)
     plt.savefig('.\core\static\core\graph.png')
 
 
@@ -75,6 +86,7 @@ def SendTGMessage(msg):
         return False
 
 
+@time_of_function
 def ReadSheets():
     CREDENTIALS_FILE = config('CREDENTIALS_FILE')
     SPREADSHEETS_ID = config('SPREADSHEETS_ID')
@@ -87,14 +99,13 @@ def ReadSheets():
     httpAuth = credentials.authorize(httplib2.Http())
     service = apiclient.discovery.build('sheets', 'v4', http=httpAuth)
 
-    # Пример чтения файла
+    # Чтение таблицы, скорость работы не зависит от длинны диапазона, ставим 99999 строк
+
     values = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEETS_ID,
-        range='A1:D60',
+        range='A1:D99999',
         majorDimension='COLUMNS'
     ).execute()
-
-    # TODO поменять на динамическое определение диапазона
 
     ParseResult.objects.all().delete()
 
@@ -102,7 +113,7 @@ def ReadSheets():
 
     for i in range(1, len(values['values'][0])):
 
-        parsed_price = int(float(values['values'][2][i]) * float(get_course()))
+        price_rur = int(float(values['values'][2][i]) * float(get_course()))
 
         d = datetime.strptime(values['values'][3][i], "%d.%m.%Y")
         parsed_date = d.strftime('%Y-%m-%d')
@@ -113,14 +124,14 @@ def ReadSheets():
 
         ParseResult(number=values['values'][0][i],
                     order_id=values['values'][1][i],
-                    price=parsed_price,
+                    price_usd=values['values'][2][i],
+                    price_rur=price_rur,
                     delivery_time=parsed_date,
                     delivery_time_orig=values['values'][3][i],
                     expired=expired,
                     ).save()
 
         if expired:
-            expired_log += f'Заказ с ID:{values["values"][1][i]} просрочен\n'
-
+            expired_log += f'Заказ с №:{values["values"][1][i]} просрочен\n'
 
     return expired_log
