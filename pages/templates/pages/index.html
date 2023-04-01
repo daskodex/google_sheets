@@ -24,17 +24,13 @@ tr:nth-child(even) {
 </style>
 </head>
 <body>
-
-
-
 <div><img src="{% static 'core/top_logo.png' %}"></div>
+
+<h2> Сумма по столбцу "Cтоимость, $": {{ sum.price_usd__sum }}</h2>
 
 <div><img src="{% static 'core/graph.png' %}"></div>
 
-
-<h2>Аналитика из гугл-таблицы:
-  Сумма по столбцу <b>"Cтоимость, $": {{ sum.price_usd__sum }}</b>
-</h2>
+<h2>Аналитика из гугл-таблицы:</h2>
 
 <table>
   <thead>

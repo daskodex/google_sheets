@@ -99,11 +99,11 @@ def ReadSheets():
     httpAuth = credentials.authorize(httplib2.Http())
     service = apiclient.discovery.build('sheets', 'v4', http=httpAuth)
 
-    # Чтение таблицы, скорость работы не зависит от длинны диапазона, ставим 99999 строк
+    # Чтение таблицы, A1:D - читаем с А1 до конца D
 
     values = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEETS_ID,
-        range='A1:D99999',
+        range='A1:D',
         majorDimension='COLUMNS'
     ).execute()
 
@@ -119,8 +119,6 @@ def ReadSheets():
         parsed_date = d.strftime('%Y-%m-%d')
 
         expired = True if str(date.today()) > parsed_date else False
-
-        # Функция шлет сообщения от бота о том что заказ просрочен
 
         ParseResult(number=values['values'][0][i],
                     order_id=values['values'][1][i],
